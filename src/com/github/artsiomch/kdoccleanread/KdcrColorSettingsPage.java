@@ -19,29 +19,28 @@ import java.util.Map;
 public class KdcrColorSettingsPage implements ColorSettingsPage {
   public static final TextAttributesKey CODE_TAG =
       TextAttributesKey.createTextAttributesKey(
-          "code tag", DefaultLanguageHighlighterColors.DOC_COMMENT_MARKUP);
+          "KDCR_CODE", DefaultLanguageHighlighterColors.DOC_COMMENT_MARKUP);
   public static final TextAttributesKey LINK_TAG =
       TextAttributesKey.createTextAttributesKey(
           "link tag", DefaultLanguageHighlighterColors.CLASS_NAME);
   public static final TextAttributesKey HTML_LINK_TAG =
       TextAttributesKey.createTextAttributesKey(
-          "html link tag", DefaultLanguageHighlighterColors.NUMBER);
+          "KDCR_HTML_LINK", DefaultLanguageHighlighterColors.NUMBER);
 
   public static final TextAttributesKey BOLD_FONT =
-      TextAttributesKey.createTextAttributesKey("MY_BOLD");
+      TextAttributesKey.createTextAttributesKey("KDCR_BOLD");
   public static final TextAttributesKey ITALIC_FONT =
-      TextAttributesKey.createTextAttributesKey("MY_ITALIC");
+      TextAttributesKey.createTextAttributesKey("KDCR_ITALIC");
   public static final TextAttributesKey BORDERED =
-      TextAttributesKey.createTextAttributesKey("MY_BORDERED");
+      TextAttributesKey.createTextAttributesKey("KDCR_BORDERED");
 
   private static final AttributesDescriptor[] DESCRIPTORS =
       new AttributesDescriptor[] {
-          new AttributesDescriptor("Tag value of: <code> | <tt> | @code | <pre>", CODE_TAG),
-          new AttributesDescriptor("Tag value of html link: <a href=...>...</a>", HTML_LINK_TAG),
-          new AttributesDescriptor("Tag value of: @link", LINK_TAG),
+          new AttributesDescriptor("Tag value of `code` or \"    code\"", CODE_TAG),
+          new AttributesDescriptor("Link name: [link name](https://...)", HTML_LINK_TAG),
           new AttributesDescriptor("Emphasis strong: **abc** | __abc__", BOLD_FONT),
           new AttributesDescriptor("Emphasis regular: *abc* | _abc_", ITALIC_FONT),
-          new AttributesDescriptor("Html / Javadoc Tags and Escaped Chars additional Mark Up", BORDERED)
+          new AttributesDescriptor("Markdown tags: * | _ | ` ", BORDERED)
       };
 
   @Nullable

@@ -13,23 +13,6 @@
     ]]></description>
 
   <change-notes><![CDATA[
-            0.3.1 - Make new functionality (see 0.3.0) available since 181.0 instead of 183.0 <br>
-            0.3.0 - Multi-line Html/Javadoc tag and tag's value support added (all possible cases founded). Also added/fixed: <br>
-                &emsp; - Annotate Html/Javadoc tag and Html Escaped chars (with Bordering effect by default - customisable). <br>
-                &emsp; - Customisation for &lt;b&gt; and &lt;i&gt; tags added. <br>
-                &emsp; - Proper support for both Default and Darcula themes added. <br>
-                &emsp; - fix <a href="https://youtrack.jetbrains.com/issue/IDEA-198738">IDEA-198738</a>. <br>
-                &emsp; - &lt;a name=...&gt; support (and separation from &lt;a href=...&gt;) added. <br>
-                &emsp; - CPU usage and Mem allocation optimisations. <br>
-            0.2.2 - Highlight &lt;a href=...&gt; tag value &lt;/a&gt; (customisable). <br>
-            0.2.1 - Few improvements: <br>
-                &emsp; - @literal tag support added; <br>
-                &emsp; - text inside @code and @literal is not interpreting as HTML markup; <br>
-            0.2.0 - Refactoring and covering by tests. Plugin should be more stable and less error prone. Also fixed issues with: <br>
-                &emsp; - Multiline @link and @code tag folding; <br>
-                &emsp; - @linkplain tag added (@link rules applied); <br>
-                &emsp; - Unescaping for not valid escaped chars sequence; <br>
-                &emsp; - Not interpreting the text as HTML markup inside @code tag (&lt;Generics&gt;); <br>
             0.1.0 - Initial release: <br>
                 &emsp; * hiding(folding) HTML tags; <br>
                 &emsp; * unescape HTML escaped chars; <br>
@@ -45,16 +28,17 @@
   <!-- uncomment to enable plugin in all products
   <depends>com.intellij.modules.lang</depends>
   -->
-  <depends>com.intellij.modules.java</depends>
+  <depends>org.jetbrains.kotlin</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here
     <lang.foldingBuilder language="JAVA" implementationClass="com.github.artsiomch.jdcr.JdcrFoldingBuilder"/>
     -->
-    <annotator language="Kotlin" implementationClass="com.github.artsiomch.kdoccleanread.KdcrAnnotator"/>
+    <annotator language="kotlin" implementationClass="com.github.artsiomch.kdoccleanread.KdcrAnnotator"/>
     <colorSettingsPage implementation="com.github.artsiomch.kdoccleanread.KdcrColorSettingsPage" />
     <additionalTextAttributes scheme="Darcula" file="colorSchemes/KdcrLangDarcula.xml"/>
     <additionalTextAttributes scheme="Default" file="colorSchemes/KdcrLangDefault.xml"/>
+    <lang.foldingBuilder language="kotlin" implementationClass="com.github.artsiomch.kdoccleanread.KdcrFoldingBuilder"/>
   </extensions>
 
   <actions>

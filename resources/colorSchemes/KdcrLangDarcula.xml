@@ -1,15 +1,15 @@
 <list>
-  <option name="MY_BOLD">
+  <option name="KDCR_BOLD">
     <value>
       <option name="FONT_TYPE" value="3"/>
     </value>
   </option>
-  <option name="MY_ITALIC">
+  <option name="KDCR_ITALIC">
     <value>
       <option name="FONT_TYPE" value="3"/>
     </value>
   </option>
-  <option name="MY_BORDERED">
+  <option name="KDCR_BORDERED">
     <value>
       <option name="EFFECT_COLOR" value="3c3f41" />
     </value>
