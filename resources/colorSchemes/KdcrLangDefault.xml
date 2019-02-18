@@ -11,7 +11,7 @@
   </option>
   <option name="KDCR_BORDERED">
     <value>
-      <option name="EFFECT_COLOR" value="CACACA" />
+      <!--<option name="EFFECT_COLOR" value="CACACA" />-->
     </value>
   </option>
 </list>

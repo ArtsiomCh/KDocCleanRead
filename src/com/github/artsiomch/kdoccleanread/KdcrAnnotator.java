@@ -13,6 +13,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.kdoc.lexer.KDocTokens;
 
@@ -31,15 +32,19 @@ public class KdcrAnnotator implements Annotator {
     IElementType elementType = element.getNode().getElementType();
     if (elementType == KDocTokens.TEXT) {
       String text = element.getText();
-      //        && !JdcrPsiTreeUtils.isInsideCodeOrLiteralTag((PsiDocToken) element))
-      KdsrStringUtil.getAllEmphasis(text).forEach(this::annotateEmphasis);
-      KdsrStringUtil.getCodeSpans(text).forEach(this::annotateCodeTag);
+
+      final List<MarkdownTag> codeSpans = KdsrStringUtil.getCodeSpans(text);
+      codeSpans.forEach(this::annotateCodeTag);
+
+      final List<TextRange> excludeRanges =
+          codeSpans.stream().map(tag -> tag.value).collect(Collectors.toList());
+      KdsrStringUtil.getAllEmphasis(text, excludeRanges).forEach(this::annotateEmphasis);
 
     } else if (elementType == KDocTokens.CODE_BLOCK_TEXT) {
       doAnnotate(
-          new TextRange(0, element.getTextRange().getLength()), KdcrColorSettingsPage.CODE_TAG);
+          new TextRange(0, element.getTextLength()), KdcrColorSettingsPage.CODE_TAG);
       // Not really correct, but people misuse spaces for text formatting...
-//  doAnnotate(KdsrStringUtil.getLastLinkName(element.getText()), KdcrColorSettingsPage.HTML_LINK_TAG);
+      // doAnnotate(KdsrStringUtil.getLastLinkName(element.getText()), KdcrColorSettingsPage.HTML_LINK_TAG);
 
     } else if (elementType == KDocTokens.MARKDOWN_INLINE_LINK) {
       doAnnotate(
@@ -67,8 +72,8 @@ public class KdcrAnnotator implements Annotator {
   private static int countAnnotation = 0;
 
   private void doAnnotate(
-      @NotNull TextRange rangeInElement, @NotNull TextAttributesKey textAttributesKey) {
-    if (rangeInElement.getLength() == 0) return;
+      TextRange rangeInElement, @NotNull TextAttributesKey textAttributesKey) {
+    if (rangeInElement == null) return;
 
     Annotation annotation =
         holder.createInfoAnnotation(

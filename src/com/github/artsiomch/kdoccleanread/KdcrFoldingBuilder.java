@@ -1,7 +1,5 @@
 package com.github.artsiomch.kdoccleanread;
 
-import org.jetbrains.kotlin.lexer.KtTokens;
-
 import com.github.artsiomch.kdoccleanread.utils.KdsrStringUtil;
 import com.github.artsiomch.kdoccleanread.utils.MarkdownTag;
 import com.intellij.lang.ASTNode;
@@ -13,14 +11,17 @@ import com.intellij.openapi.editor.FoldingGroup;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.kdoc.lexer.KDocTokens;
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocLink;
-import org.jetbrains.kotlin.kdoc.psi.impl.KDocSection;
+import org.jetbrains.kotlin.kdoc.psi.api.KDoc;
+import org.jetbrains.kotlin.lexer.KtTokens;
 
 public class KdcrFoldingBuilder implements FoldingBuilder {
 
@@ -32,16 +33,43 @@ public class KdcrFoldingBuilder implements FoldingBuilder {
   public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
     PsiElement root = node.getPsi();
     foldingDescriptors = new ArrayList<>();
-    for (KDocSection kdocSection : PsiTreeUtil.findChildrenOfType(root, KDocSection.class)) {
-      foldingGroup = FoldingGroup.newGroup("KDCR fold: " + kdocSection.getTextRange().toString());
+    for (KDoc kDoc : PsiTreeUtil.findChildrenOfType(root, KDoc.class)) {
+      foldingGroup = FoldingGroup.newGroup("KDCR fold: " + kDoc.getTextRange().toString());
 
-      PsiTreeUtil.findChildrenOfType(kdocSection, LeafPsiElement.class).stream()
-          .filter(el -> el.getNode().getElementType() == KDocTokens.TEXT)
-          .forEach(this::foldMarkDownTags);
+      for (LeafPsiElement el : PsiTreeUtil.findChildrenOfType(kDoc, LeafPsiElement.class)) {
+        final IElementType elementType = el.getNode().getElementType();
+        if (elementType == KDocTokens.TEXT) {
+          foldMarkDownTags(el);
+        } else if (elementType == KDocTokens.MARKDOWN_INLINE_LINK) {
+          foldInlineLink(el);
+        }
+      }
 
-      PsiTreeUtil.findChildrenOfType(kdocSection, KDocLink.class).forEach(this::foldLink);
+      PsiTreeUtil.findChildrenOfType(kDoc, KDocLink.class).forEach(this::foldLink);
     }
     return foldingDescriptors.toArray(new FoldingDescriptor[0]);
+  }
+
+  private void foldInlineLink(@NotNull LeafPsiElement element) {
+    final String text = element.getText();
+    final TextRange linkName = KdsrStringUtil.getLastLinkName(text);
+    if (linkName == null) return;
+    // `[`
+    addFoldingDescriptor(element, new TextRange(0, 1));
+    // `]`
+    addFoldingDescriptor(
+        element, new TextRange(linkName.getEndOffset(), linkName.getEndOffset() + 1));
+    // http://...
+    final TextRange httpLinkRange = new TextRange(linkName.getEndOffset() + 2, text.length() - 1);
+    String placeholderText = httpLinkRange.substring(text);
+    final int prefixIndex = placeholderText.indexOf("//") + 2;
+    int domainEndIndex = placeholderText.indexOf('/', prefixIndex);
+    domainEndIndex =
+        (domainEndIndex > 0)
+            ? domainEndIndex
+            : (placeholderText.length() > 10) ? 10 : placeholderText.length();
+    placeholderText = placeholderText.substring(prefixIndex, domainEndIndex);
+    addFoldingDescriptor(element, httpLinkRange, placeholderText);
   }
 
   private void foldLink(@NotNull KDocLink link) {
@@ -51,13 +79,17 @@ public class KdcrFoldingBuilder implements FoldingBuilder {
     if (prevSibling != null
         && prevSibling.getNode().getElementType() == KDocTokens.TEXT
         && prevSibling.getText().charAt(prevSibling.getTextLength() - 1) == ']'
-        && (linkLabelRange = KdsrStringUtil.getLastLinkName(prevSibling.getText())).getLength() != 0
+        && (linkLabelRange = KdsrStringUtil.getLastLinkName(prevSibling.getText())) != null
         && linkLabelRange.getEndOffset() == prevSibling.getTextLength() - 1) {
       // case of [label][link] -> label(link)
       leftBracketPlaceholder = "(";
       rightBracketPlaceholder = ")";
-      addFoldingDescriptor(prevSibling, new TextRange(linkLabelRange.getStartOffset()-1, linkLabelRange.getStartOffset()));
-      addFoldingDescriptor(prevSibling, new TextRange(linkLabelRange.getEndOffset(), linkLabelRange.getEndOffset()+1));
+      addFoldingDescriptor(
+          prevSibling,
+          new TextRange(linkLabelRange.getStartOffset() - 1, linkLabelRange.getStartOffset()));
+      addFoldingDescriptor(
+          prevSibling,
+          new TextRange(linkLabelRange.getEndOffset(), linkLabelRange.getEndOffset() + 1));
     }
     // fold only `[` and `]`
     PsiElement leftBracket = link.getFirstChild();
@@ -72,8 +104,13 @@ public class KdcrFoldingBuilder implements FoldingBuilder {
 
   private void foldMarkDownTags(@NotNull LeafPsiElement element) {
     String text = element.getText();
-    KdsrStringUtil.getAllEmphasis(text).forEach(emphasis -> foldTag(element, emphasis));
-    KdsrStringUtil.getCodeSpans(text).forEach(codeTag -> foldTag(element, codeTag));
+    final List<MarkdownTag> codeSpans = KdsrStringUtil.getCodeSpans(text);
+    codeSpans.forEach(codeTag -> foldTag(element, codeTag));
+
+    final List<TextRange> excludeRanges =
+        codeSpans.stream().map(tag -> tag.value).collect(Collectors.toList());
+    KdsrStringUtil.getAllEmphasis(text, excludeRanges)
+        .forEach(emphasis -> foldTag(element, emphasis));
   }
 
   private void foldTag(@NotNull PsiElement element, @NotNull MarkdownTag tag) {

@@ -5,23 +5,40 @@
   <vendor email="achapialiou@gmail.com" url="http://github.com/ArtsiomCh/KDocCleanRead">Artsiom Chapialiou</vendor>
 
   <description><![CDATA[
-      Making KDoc (Kotlin) comments more readable by:<br>
-      <li> Hiding(folding) HTML tags;
-      <li> Unescape HTML escaped chars;
-      <li> Text styles for value of tags: &lt;code&gt; | &lt;tt&gt; | &lt;li&gt; | &lt;b&gt; | &lt;i&gt; | &lt;a href/name=...&gt; | @code | @literal | @link | @linkplain | @value;
-      <li> Tag and tag's value text styles are customisable at Settings -> Editor -> Color Scheme -> JavaDoc Clean Read.
+      Making KDoc (Kotlin) comments more readable by:
+        <ul>
+          <li> Text styles for value of tags: <br>
+            <ul>
+              <li> `<code>code</code>` and "&nbsp;&nbsp;&nbsp;&nbsp;<code>code</code>" <br>
+              <li> _<i>regular emphasis</i>_ *<i>regular emphasis</i>* <br>
+              <li> __<b>strong emphasis</b>__ **<b>strong emphasis</b>** <br>
+              <li> [<a>link name</a>](http://...)
+            </ul>
+          <li> Hiding(folding) brackets at some markdown tags:
+            <ul>
+              <li> `code` -> code ;
+              <li> _emphasis_ -> emphasis ;
+              <li> **emphasis** -> emphasis ;
+              <li> [link] -> link ;
+              <li> [my github](http://github.com/ArtsiomCh) -> my github(github.com)
+            </ul>
+          <li> Tag and tag's value text styles are customisable at:
+            <br> Settings -> Editor -> Color Scheme -> KDoc Clean Read.
+        </ul>
     ]]></description>
 
   <change-notes><![CDATA[
-            0.1.0 - Initial release: <br>
-                &emsp; * hiding(folding) HTML tags; <br>
-                &emsp; * unescape HTML escaped chars; <br>
-                &emsp; * text styles for tags: &lt;code&gt; | &lt;tt&gt; | &lt;li&gt; | &lt;b&gt; | &lt;i&gt; | @code | @link (fix <a href="https://youtrack.jetbrains.com/issue/IDEA-197760">IDEA-197760</a>). <br>
+      0.0.1 - Initial MVP release:
+        <ul>
+          <li> Text styles for value of markdown tags: ` ; _ and * ; __ and ** ; [link name](http...)
+          <li> Hiding(folding) brackets at some markdown tags: ` ; _ and * ; __ and ** ; [link] ; [link name](http...)
+          <li> Customisation at: Settings -> Editor -> Color Scheme -> KDoc Clean Read.
+        </ul>
     ]]>
   </change-notes>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="181.0"/>
+  <idea-version since-build="181.0" until-build="191.0"/>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
@@ -32,7 +49,6 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here
-    <lang.foldingBuilder language="JAVA" implementationClass="com.github.artsiomch.jdcr.JdcrFoldingBuilder"/>
     -->
     <annotator language="kotlin" implementationClass="com.github.artsiomch.kdoccleanread.KdcrAnnotator"/>
     <colorSettingsPage implementation="com.github.artsiomch.kdoccleanread.KdcrColorSettingsPage" />
