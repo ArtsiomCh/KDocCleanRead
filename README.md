@@ -1,4 +1,4 @@
-###KDoc Clean Read plugin for IntelliJ platform IDEs.
+### KDoc Clean Read plugin for IntelliJ platform IDEs.
 
 Making KDoc (Kotlin) comments more readable by:
   <ul>
