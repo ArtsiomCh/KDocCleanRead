@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.github.ArtsiomCh.KDocCleanRead</id>
   <name>KDoc Clean Read</name>
-  <version>213.1</version>
+  <version>233.1</version>
   <vendor email="achapialiou@gmail.com" url="http://github.com/ArtsiomCh/KDocCleanRead">Artsiom Chapialiou</vendor>
 
   <description><![CDATA[
@@ -28,6 +28,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      233.1 - Fixed "IllegalStateException: Folding descriptor...". <br>
       213.1 - Compatibility with all JB products (not just Idea) supported Kotlin. <br>
       203.1 - Compatibility to 2020.3 and up added. <br>
       201.1 - Compatibility up to 2020.1 tested and added. <br>
@@ -43,7 +44,7 @@
   </change-notes>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="181.0" until-build="999.*"/>
+  <idea-version since-build="193.0" until-build="999.*"/>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
@@ -52,6 +53,7 @@
   -->
   <depends>com.intellij.modules.lang</depends>
   <depends>org.jetbrains.kotlin</depends>
+  <depends>com.intellij.java</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here
